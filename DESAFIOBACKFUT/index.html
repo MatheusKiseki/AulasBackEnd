@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+      integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+      crossorigin="anonymous"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <title>Desafio</title>
+  </head>
+  <body class="fundo">
+    <div id="app">
+      <div class="row">
+        <div class="col-12 text-center mt-4 rounded margem">
+          <h2 class="text-white text-center mt-4">
+            KISEKITTER
+          </h2>       
+          </div>
+        </div>
+      <div class="row">
+        <div class="jumbotron" v-if = "usuarioCriado == false">
+            <h1 class="display-4">Eae, Primo(a)!</h1>
+            <p class="lead">É aqui onde voce vai digitar seu usuario!</p>
+            <hr class="my-4">
+            <input
+            v-model="novoUsuario"
+            @keyup.enter="addUsuario"
+            ref="novoUsuario"
+            type="text"
+            class="form-control col-12"
+            placeholder="SEJA CRIATIVO!"
+          />
+          <button
+            @click="addUsuario"
+            type="button"
+            class="text-center text-white btn botao fundo"
+          >
+            <span class="">MANDA VER!</span>
+          </button>
+        </div>  
+      <div v-else class="container justify-content-center offset-4">
+        <div class="col-4"></div>
+        <div class="card text-center col-4 offset-1 margembaixo">
+          <div class="card-body">
+            <h5 class="card-title">Usuário: {{Usuarios}} </h5> <label for="">Mensagem: </label>
+            <input v-model="novoPost" @keyup.enter="addPost" ref="novoPost" type="text" placeholder="escreva seu post" class="card-text"></input>
+          </div>
+        </div>
+        <div v-for= "post in posts" class="text-center col-4 offset-1">
+          <div class="card margembaixo">
+                <div class="card-body">
+                  <h5 class="card-title">Usuário: {{post.author}}</h5>
+                  <p class="card-text">Mensagem: {{post.content}}</p>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button 
+              @click="addPost"
+              type="button"
+              class="text-center btn botao fundobranco"> DALE PORRA</button>
+            </div>
+          </div>
+        </div>
+        </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script>
+      const app = new Vue({
+        el: "#app",
+        data: {
+          posts: [],
+          novoPost: '',
+          novoUsuario: '',
+          Usuarios:'',
+          usuarioCriado : false,
+        },
+
+        methods: {
+            addUsuario: function(){
+                  //this.tarefas.push(this.novaTarefa)
+                  if(this.novoUsuario !== ''){
+                    this.usuarioCriado = true 
+                    this.Usuarios = this.novoUsuario
+                    this.novoUsuario = ''       
+                  }
+          },
+          addPost: function(){
+            if(this.novoPost !== ''){
+            axios    
+            .post("http://localhost:3000/posts", { author: this.Usuarios , content: this.novoPost })
+            .then(response => { 
+                this.posts = [response.data, ...this.posts]
+                this.novoPost = ''
+                this.$refs.novoPost.focus()           
+            })
+          }
+          },
+        },
+        created: 
+             function () {
+            //this.repositorios.push(this.NovoRepositorio)
+              axios
+                .get("http://localhost:3000/posts")
+                .then((response) => {
+                  console.log(response.data)
+                  this.posts = response.data
+                })
+                .catch((err) => {
+                  console.log('deu ruim')
+                });
+          },
+      });
+    </script>
+  </body>
+</html>
